@@ -20,7 +20,6 @@ public class Member {
 
     private String passwordHash;
 
-    //@Getter(AccessLevel.NONE)
     private MemberStatus status;
 
     public Member(String nickName, String email, String passwordHash) {
