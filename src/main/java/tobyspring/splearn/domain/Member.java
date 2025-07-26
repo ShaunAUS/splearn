@@ -8,6 +8,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.util.Objects;
 
+import static java.util.Objects.*;
 import static org.springframework.util.Assert.*;
 
 @Getter
@@ -16,21 +17,24 @@ public class Member {
 
     private String nickName;
 
-    private String email;
+    private Email email;
 
     private String passwordHash;
 
     private MemberStatus status;
 
-    private Member(String nickName, String email, String passwordHash) {
-        this.nickName = Objects.requireNonNull(nickName);
-        this.email = Objects.requireNonNull(email);
-        this.passwordHash = Objects.requireNonNull(passwordHash);
-        this.status = MemberStatus.PENDING;
+    private Member() {
     }
 
-    public static Member create(String email, String nickName, String password, PasswordEncoder passwordEncoder) {
-        return new Member(nickName, email, passwordEncoder.encode(password));
+    public static Member create(MemberCreateRequest memberCreateRequest, PasswordEncoder passwordEncoder) {
+        Member member = new Member();
+
+        member.email = new Email(memberCreateRequest.email());
+        member.nickName = requireNonNull(memberCreateRequest.nickName());
+        member.passwordHash = requireNonNull(passwordEncoder.encode(memberCreateRequest.password()));
+        member.status = MemberStatus.PENDING;
+
+        return member;
     }
 
     public void activate() {
@@ -50,10 +54,15 @@ public class Member {
     }
 
     public void changeNickName(String newNickName) {
-        this.nickName = newNickName;
+        this.nickName = requireNonNull(newNickName);
     }
 
-    public void changePasword(String newPassword,PasswordEncoder passwordEncoder) {
-        this.passwordHash = passwordEncoder.encode(newPassword);
+    public void changePasword(String newPassword, PasswordEncoder passwordEncoder) {
+        this.passwordHash = passwordEncoder.encode(requireNonNull(newPassword));
     }
+
+    public boolean isActive() {
+        return this.status == MemberStatus.ACTIVE;
+    }
+
 }
