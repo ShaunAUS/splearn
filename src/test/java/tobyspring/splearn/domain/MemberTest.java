@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static tobyspring.splearn.domain.MemberFixture.createMemberRegisterRequest;
+import static tobyspring.splearn.domain.MemberFixture.createPasswordEncoder;
 
 class MemberTest {
 
@@ -13,31 +15,10 @@ class MemberTest {
 
     @BeforeEach
     void setUp() {
-        passwordEncoder = new PasswordEncoder() {
-            @Override
-            public String encode(String password) {
-                return password.toUpperCase();
-            }
-
-            @Override
-            public boolean matches(String password, String passwordHash) {
-                return encode(password).equals(passwordHash);
-            }
-        };
-
-
-        member = Member.register(new MemberRegisterRequest("mm@naver.com", "testUser", "password123"), new PasswordEncoder() {
-            @Override
-            public String encode(String password) {
-                return "encodedPasswordHash";
-            }
-
-            @Override
-            public boolean matches(String password, String passwordHash) {
-                return "encodedPasswordHash".equals(passwordHash);
-            }
-        });
+        this.passwordEncoder = createPasswordEncoder();
+        member = Member.register(createMemberRegisterRequest("mm@naver.com"), passwordEncoder);
     }
+
 
     @Test
     void registerMember() {
@@ -103,7 +84,7 @@ class MemberTest {
 
     @Test
     void changePassword() {
-        member.changePasword("newPassword",passwordEncoder);
+        member.changePasword("newPassword", passwordEncoder);
 
         assertThat(member.verifyPassword("newPassword", passwordEncoder)).isTrue();
     }
@@ -123,10 +104,10 @@ class MemberTest {
     @Test
     void invalidEmail() {
         assertThatThrownBy(() ->
-            Member.register(new MemberRegisterRequest("invalidEmail", "testUser", "password123"), passwordEncoder))
-            .isInstanceOf(IllegalArgumentException.class);
+                Member.register(createMemberRegisterRequest("invalidEmail"), passwordEncoder))
+                .isInstanceOf(IllegalArgumentException.class);
 
-        Member.register(new MemberRegisterRequest("test@naver.com", "testUser", "password123"), passwordEncoder);
+        Member.register(createMemberRegisterRequest("test@naver.com"), passwordEncoder);
 
     }
 }
