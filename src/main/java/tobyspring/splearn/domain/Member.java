@@ -5,6 +5,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.NaturalIdCache;
 
 import static java.util.Objects.*;
 import static org.springframework.util.Assert.*;
@@ -13,6 +15,7 @@ import static org.springframework.util.Assert.*;
 @Getter
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NaturalIdCache
 public class Member {
 
     @Id
@@ -22,6 +25,7 @@ public class Member {
     private String nickName;
 
     @Embedded
+    @NaturalId // 비즈니스 적으로 의미있는 id값
     private Email email;
 
     private String passwordHash;
